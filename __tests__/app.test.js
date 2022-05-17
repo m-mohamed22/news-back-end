@@ -59,7 +59,7 @@ describe("2. GET/api/articles/:article_id", () => {
           created_at: time,
           votes: 0,
         };
-        expect(body.article).toEqual(thirdArticle);
+        expect(body.article).toMatchObject(thirdArticle);
       });
   });
 });
