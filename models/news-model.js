@@ -12,3 +12,15 @@ exports.selectArticleById = (article_id) => {
       return articles.rows;
     });
 };
+exports.updateArticleById = (articleId, incVotes) => {
+  const { article_id } = articleId;
+  const { inc_votes } = incVotes;
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $1  WHERE article_id = $2 RETURNING *;`,
+      [inc_votes, article_id]
+    )
+    .then((articles) => {
+      return articles.rows[0];
+    });
+};

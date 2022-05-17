@@ -1,4 +1,8 @@
-const { selectTopics, selectArticleById } = require("../models/news-model.js");
+const {
+  selectTopics,
+  selectArticleById,
+  updateArticleById,
+} = require("../models/news-model.js");
 
 exports.getTopics = (req, res, next) => {
   selectTopics()
@@ -15,6 +19,16 @@ exports.getArticleById = (req, res, next) => {
   selectArticleById(article_id)
     .then((article) => {
       res.status(200).send({ article: article[0] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchArticleById = (req, res, next) => {
+  updateArticleById(req.params, req.body)
+    .then((updatedArticle) => {
+      res.status(200).send({ article: updatedArticle });
     })
     .catch((err) => {
       next(err);

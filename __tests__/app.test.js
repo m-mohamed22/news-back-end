@@ -63,3 +63,47 @@ describe("2. GET/api/articles/:article_id", () => {
       });
   });
 });
+
+describe("3: PATCH /api/articles/:article_id", () => {
+  test("Status:200, responds with the updated article when vote is incremented", () => {
+    const time = new Date(1604394720000).toISOString();
+    const updatedArticle = {
+      article_id: 3,
+      title: "Eight pug gifs that remind me of mitch",
+      topic: "mitch",
+      author: "icellusedkars",
+      body: "some gifs",
+      created_at: time,
+      votes: 1,
+    };
+    const newVote = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/3")
+      .send(newVote)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toEqual(updatedArticle);
+      });
+  });
+  test("Status:200, responds with the updated article when vote is decremented", () => {
+    //  const time = new Date(1594329060000).toISOString();
+    const time = "2020-07-09T20:11:00.000Z";
+    const updatedArticle = {
+      article_id: 1,
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      created_at: time,
+      votes: 0,
+    };
+    const newVote = { inc_votes: -100 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVote)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toEqual(updatedArticle);
+      });
+  });
+});
