@@ -10,8 +10,8 @@ afterAll(() => {
   if (db.end) db.end();
 });
 
-describe("1. GET /api/topics", () => {
-  test("status:200, responds with an array of topicData objects", () => {
+describe("1. GET/api/topics", () => {
+  test("status:200, responds with an array of topics objects", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
@@ -31,13 +31,35 @@ describe("1. GET /api/topics", () => {
   });
 });
 
-describe("Status:404, should respond with an error message", () => {
-  test("Status:404 ", () => {
+describe("Status: 404", () => {
+  test("Status:404 returns an error message when path is not found", () => {
     return request(app)
-      .get("/api/art")
+      .get("/api/topiks")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Error, path not found");
+      });
+  });
+});
+
+describe("2. GET/api/articles/:article_id", () => {
+  test("Status:200, responds with an article object", () => {
+    const article_id = 3;
+    const time = new Date(1604394720000).toISOString();
+    return request(app)
+      .get(`/api/articles/${article_id}`)
+      .expect(200)
+      .then(({ body }) => {
+        const thirdArticle = {
+          article_id: 3,
+          title: "Eight pug gifs that remind me of mitch",
+          topic: "mitch",
+          author: "icellusedkars",
+          body: "some gifs",
+          created_at: time,
+          votes: 0,
+        };
+        expect(body.article).toMatchObject(thirdArticle);
       });
   });
 });
