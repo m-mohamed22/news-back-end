@@ -18,7 +18,7 @@ exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
   selectArticleById(article_id)
     .then((article) => {
-      res.status(200).send({ article: article[0] });
+      res.status(200).send({ article: article });
     })
     .catch((err) => {
       next(err);
@@ -31,6 +31,7 @@ exports.patchArticleById = (req, res, next) => {
       res.status(200).send({ article: updatedArticle });
     })
     .catch((err) => {
+      console.log(err, "<<< controllerrrr");
       next(err);
     });
 };
