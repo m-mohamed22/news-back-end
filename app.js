@@ -11,11 +11,15 @@ const { getUsers } = require("./controllers/users-controller ");
 const app = express();
 app.use(express.json());
 
+/***topics***/
 app.get("/api/topics", getTopics);
+
+/***articles***/
 app.get("/api/articles/:article_id", getArticleById);
 
 app.patch("/api/articles/:article_id", patchArticleById);
 
+/***users***/
 app.get("/api/users", getUsers);
 
 app.all("/*", (req, res) => {
