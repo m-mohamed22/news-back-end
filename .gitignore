@@ -1,2 +1,6 @@
 node_modules
 .env.*
+
+news-controller_copy.js
+news-model_copy.js
+app_copy.test.js

@@ -39,17 +39,6 @@ describe("1. GET/api/topics", () => {
   });
 });
 
-/*describe("Status: 404", () => {
-  test("Status:404 returns an error message when path is not found", () => {
-    return request(app)
-      .get("/api/topiks")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Error, path not found");
-      });
-  });
-});*/
-
 describe("2. GET/api/articles/:article_id", () => {
   test("Status:200, responds with an article object", () => {
     const article_id = 3;
@@ -154,6 +143,33 @@ describe("3: PATCH /api/articles/:article_id", () => {
   });
 });
 
-//if user inputs article that could exist but does not == error 404
-//if user inputs incorrect data type = error 400 (entered a string instead of number)
-//if user enters incorrect or missing data (req.body) then error = 400
+describe("6. GET/api/users", () => {
+  test("status:200, responds with an array of objects with the property username", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toBeInstanceOf(Array);
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+
+  test("Status:404 returns an error message when path is not found", () => {
+    return request(app)
+      .get("/api/ucers")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Error, path not found");
+      });
+  });
+});

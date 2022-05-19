@@ -2,7 +2,7 @@ const {
   selectTopics,
   selectArticleById,
   updateArticleById,
-} = require("../models/news-model.js");
+} = require("../models/articles-model.js");
 
 exports.getTopics = (req, res, next) => {
   selectTopics()
