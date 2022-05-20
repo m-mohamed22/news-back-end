@@ -1,13 +1,6 @@
 const db = require("../db/connection.js");
 
-//1.GET/topics
-exports.selectTopics = () => {
-  return db.query("SELECT * FROM topics;").then((topic) => {
-    return topic.rows;
-  });
-};
-
-//2.GET/articles
+//2.GET/articles/:article_id
 exports.selectArticleById = (article_id) => {
   return db
     .query(
@@ -19,7 +12,6 @@ exports.selectArticleById = (article_id) => {
       [article_id]
     )
     .then((articles) => {
-      console.log(articles);
       if (!articles.rows.length) {
         return Promise.reject({ status: 404, msg: "Invalid ID not found" });
       }
@@ -48,5 +40,23 @@ exports.updateArticleById = (articleId, incVotes) => {
       }
 
       return articles.rows[0];
+    });
+};
+
+exports.selectAllArticles = () => {
+  return db
+    .query(
+      `SELECT articles.*, 
+  CAST(COUNT(comments.article_id) AS INT) AS comment_count 
+  FROM articles 
+  LEFT JOIN comments ON articles.article_id = comments.article_id 
+  GROUP BY articles.article_id
+  ORDER BY articles.created_at DESC;`
+    )
+    .then((articles) => {
+      if (!articles.rows.length) {
+        return Promise.reject({ status: 404, msg: "Invalid ID not found" });
+      }
+      return articles.rows;
     });
 };

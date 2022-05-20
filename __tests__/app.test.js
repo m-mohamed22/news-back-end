@@ -41,6 +41,48 @@ describe("1. GET/api/topics", () => {
 });
 
 /***articles***/
+describe("8. GET/api/articles", () => {
+  test("Status:200, responds with an articles array of aritcle objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(12);
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              topic: expect.any(String),
+              author: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("Status:200, reponds with an article sorted by date(created_at) in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("Status:404 returns an error message when path is not found", () => {
+    return request(app)
+      .get("/api/artikles")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Error, path not found");
+      });
+  });
+});
 describe("2. GET/api/articles/:article_id", () => {
   test("Status:200, responds with an article object", () => {
     const article_id = 3;
@@ -126,7 +168,6 @@ describe("3: PATCH /api/articles/:article_id", () => {
       });
   });
   test("Status:200, responds with the updated article when vote is decremented", () => {
-    //  const time = new Date(1594329060000).toISOString();
     const time = "2020-07-09T20:11:00.000Z";
     const updatedArticle = {
       article_id: 1,
@@ -147,16 +188,14 @@ describe("3: PATCH /api/articles/:article_id", () => {
       });
   });
   test("Status:404 returns an error message if article is not found", () => {
-    //  const requestBody = { inc_votes: 0 };
-    return (
-      request(app)
-        .patch("/api/articles/888")
-        // .send(requestBody)
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Article ID 888 does not exist");
-        })
-    );
+    const requestBody = { inc_votes: 0 };
+    return request(app)
+      .patch("/api/articles/888")
+      .send(requestBody)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article ID 888 does not exist");
+      });
   });
   test("Status:400 returns an error message if incorrect data type is entered on path", () => {
     return request(app)
