@@ -1,13 +1,13 @@
 const {
-  selectTopics,
   selectArticleById,
   updateArticleById,
+  selectAllArticles,
 } = require("../models/articles-model.js");
 
-exports.getTopics = (req, res, next) => {
-  selectTopics()
-    .then((topics) => {
-      res.status(200).send({ topics });
+exports.getAllArticles = (req, res, next) => {
+  selectAllArticles()
+    .then((articles) => {
+      res.status(200).send({ articles });
     })
     .catch((err) => {
       next(err);
