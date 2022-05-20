@@ -66,6 +66,15 @@ describe("8. GET/api/articles", () => {
         });
       });
   });
+  test("Status:200, reponds with an article sorted by date(created_at) in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
   test("Status:404 returns an error message when path is not found", () => {
     return request(app)
       .get("/api/artikles")

@@ -12,7 +12,6 @@ exports.selectArticleById = (article_id) => {
       [article_id]
     )
     .then((articles) => {
-      console.log(articles);
       if (!articles.rows.length) {
         return Promise.reject({ status: 404, msg: "Invalid ID not found" });
       }
@@ -55,7 +54,6 @@ exports.selectAllArticles = () => {
   ORDER BY articles.created_at DESC;`
     )
     .then((articles) => {
-      console.log(articles);
       if (!articles.rows.length) {
         return Promise.reject({ status: 404, msg: "Invalid ID not found" });
       }
