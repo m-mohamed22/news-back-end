@@ -19,6 +19,18 @@ exports.selectArticleById = (article_id) => {
     });
 };
 
+//9.GET//articles/
+exports.selectAllCommentsById = (article_id) => {
+  // const { article_id } = articleId;
+
+  return db
+    .query(`SELECT * FROM comments WHERE article_id = $1;`, [article_id])
+    .then((comments) => {
+      console.log(comments, "commentsrows");
+      return comments.rows;
+    });
+};
+
 //3.PATCH/articles
 exports.updateArticleById = (articleId, incVotes) => {
   const { article_id } = articleId;
