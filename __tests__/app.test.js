@@ -217,6 +217,46 @@ describe("3: PATCH /api/articles/:article_id", () => {
   });
 });
 
+describe("9. GET /api/aritcles/:article_id/comments", () => {
+  test("Status:200, responds with an array of comments when article_id is given", () => {
+    const article_id = 3;
+    const time1 = "2020-06-20T07:24:00.000Z";
+    const time2 = "2020-09-19T23:10:00.000Z";
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(200)
+      .then(({ body }) => {
+        const allCommentsThirdArticles = [
+          {
+            comment_id: 10,
+            body: "git push origin master",
+            votes: 0,
+            author: "icellusedkars",
+            article_id: 3,
+            created_at: time1,
+          },
+          {
+            comment_id: 11,
+            body: "Ambidextrous marsupial",
+            votes: 0,
+            author: "icellusedkars",
+            article_id: 3,
+            created_at: time2,
+          },
+        ];
+        expect(body.comments).toEqual(allCommentsThirdArticles);
+      });
+  });
+  test("Status:404 returns an error message when path is not found", () => {
+    return request(app)
+      .get("/api/aritcles/:article_id/coments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Error, path not found");
+      });
+  });
+});
+
 /***users***/
 describe("6. GET/api/users", () => {
   test("status:200, responds with an array of objects with the property username", () => {
