@@ -257,6 +257,59 @@ describe("9. GET /api/aritcles/:article_id/comments", () => {
   });
 });
 
+describe("10. POST /api/articles/:article_id/comments", () => {
+  test("Status:201, responds with added comment and the posted comment from user", () => {
+    const article_id = 3;
+    const newComment = {
+      username: "lurker",
+      body: "I need a holiday",
+    };
+    return request(app)
+      .post(`/api/articles/${article_id}/comments`)
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        const newPostedComment = {
+          comment_id: 19,
+          body: "I need a holiday",
+          votes: 0,
+          author: "lurker",
+          article_id: 3,
+          created_at: expect.any(String),
+        };
+        expect(body.newCommentPost).toEqual(newPostedComment);
+      });
+  });
+  xtest("Status:404 returns an error message if article is not found", () => {
+    const article_id = 888;
+    const newComment = {
+      username: "lurker",
+      body: "I need a holiday",
+    };
+    return request(app)
+      .post(`/api/articles/${article_id}/comments`)
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article ID 888 does not exist");
+      });
+  });
+  xtest("Status:400 returns an error message if incorrect data type is entered on path", () => {
+    const article_id = "incorrectData";
+    const newComment = {
+      username: "lurker",
+      body: "I need a holiday",
+    };
+    return request(app)
+      .post(`/api/articles/${article_id}/comments`)
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+});
+
 /***users***/
 describe("6. GET/api/users", () => {
   test("status:200, responds with an array of objects with the property username", () => {

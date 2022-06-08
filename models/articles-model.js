@@ -19,15 +19,33 @@ exports.selectArticleById = (article_id) => {
     });
 };
 
-//9.GET//articles/
+//9. GET /api/articles/:article_id/comments
 exports.selectAllCommentsById = (article_id) => {
   // const { article_id } = articleId;
 
   return db
     .query(`SELECT * FROM comments WHERE article_id = $1;`, [article_id])
     .then((comments) => {
-      console.log(comments, "commentsrows");
+      if (!comments.rows.length) {
+        return Promise.reject({ status: 404, msg: "Invalid ID not found" });
+      }
       return comments.rows;
+    });
+};
+
+//10. POST /api/articles/:article_id/comments
+exports.insertNewCommentById = (postedComment, article_id) => {
+  const { username: author, body } = postedComment;
+  return db
+    .query(
+      `INSERT INTO comments (body, author, article_id) VALUES ($1, $2, $3) RETURNING *;`,
+      [body, author, article_id.article_id]
+    )
+    .then((comments) => {
+      if (!comments.rows.length) {
+        return Promise.reject({ status: 400, msg: "Bad Request" });
+      }
+      return comments.rows[0];
     });
 };
 

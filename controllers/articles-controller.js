@@ -3,6 +3,7 @@ const {
   updateArticleById,
   selectAllArticles,
   selectAllCommentsById,
+  insertNewCommentById,
 } = require("../models/articles-model.js");
 
 exports.getAllArticles = (req, res, next) => {
@@ -33,6 +34,18 @@ exports.getAllCommentsById = (req, res, next) => {
       res.status(200).send({ comments: comments });
     })
     .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postNewCommentById = (req, res, next) => {
+  const { body: postedComment, params: article_id } = req;
+  insertNewCommentById(postedComment, article_id)
+    .then((newCommentPost) => {
+      res.status(201).send({ newCommentPost: newCommentPost });
+    })
+    .catch((err) => {
+      console.log(err, "controller");
       next(err);
     });
 };
