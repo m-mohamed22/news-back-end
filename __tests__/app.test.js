@@ -291,7 +291,7 @@ describe("10. POST /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Article ID 888 does not exist");
+        expect(body.msg).toBe(`Article ID ${article_id} does not exist`);
       });
   });
   xtest("Status:400 returns an error message if incorrect data type is entered on path", () => {
@@ -310,8 +310,14 @@ describe("10. POST /api/articles/:article_id/comments", () => {
   });
 });
 
+xdescribe("11. GET /api/articles (queries)", () => {
+  test("Status: 200, accepts request from user by certain quries (sort_by, order(asc, desc) and topic)", () => {
+    return request(app).get(``);
+  });
+});
+
 /***users***/
-describe("6. GET/api/users", () => {
+xdescribe("6. GET/api/users", () => {
   test("status:200, responds with an array of objects with the property username", () => {
     return request(app)
       .get("/api/users")
