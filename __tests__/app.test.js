@@ -3,6 +3,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
+require("jest-sorted");
 
 beforeEach(() => seed(testData));
 
@@ -42,7 +43,7 @@ describe("1. GET/api/topics", () => {
 
 /***articles***/
 describe("8. GET/api/articles", () => {
-  test("Status:200, responds with an articles array of aritcle objects", () => {
+  test("Status:200, responds with an articles array of article objects", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -217,7 +218,7 @@ describe("3: PATCH /api/articles/:article_id", () => {
   });
 });
 
-describe("9. GET /api/aritcles/:article_id/comments", () => {
+describe("9. GET /api/articles/:article_id/comments", () => {
   test("Status:200, responds with an array of comments when article_id is given", () => {
     const article_id = 3;
     const time1 = "2020-06-20T07:24:00.000Z";
@@ -249,7 +250,7 @@ describe("9. GET /api/aritcles/:article_id/comments", () => {
   });
   test("Status:404 returns an error message when path is not found", () => {
     return request(app)
-      .get("/api/aritcles/:article_id/coments")
+      .get("/api/articles/:article_id/coments")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Error, path not found");
@@ -290,11 +291,12 @@ describe("10. POST /api/articles/:article_id/comments", () => {
       .post(`/api/articles/${article_id}/comments`)
       .send(newComment)
       .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe(`Article ID ${article_id} does not exist`);
+      .then(({ error }) => {
+        expect(error.body).toEqual({ msg: "Error, path not found" });
+        // (`Article ID ${article_id} does not exist`)
       });
   });
-  xtest("Status:400 returns an error message if incorrect data type is entered on path", () => {
+  test("Status: 400, returns an error message if incorrect data type is entered on path", () => {
     const article_id = "incorrectData";
     const newComment = {
       username: "lurker",
@@ -310,14 +312,115 @@ describe("10. POST /api/articles/:article_id/comments", () => {
   });
 });
 
-xdescribe("11. GET /api/articles (queries)", () => {
-  test("Status: 200, accepts request from user by certain quries (sort_by, order(asc, desc) and topic)", () => {
-    return request(app).get(``);
+describe("11. GET /api/articles (queries)", () => {
+  test("Status: 200, responds with articles sorted by title)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("title", { descending: true });
+      });
+  });
+  test("Status: 200, responds with articles sorted by votes", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("votes", { descending: true });
+      });
+  });
+  test("Status: 200, responds with articles sorted by author", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("author", { descending: true });
+      });
+  });
+  test("Status: 400, responds a bad request message when passed an invalid sort by", () => {
+    return request(app)
+      .get("/api/articles?sort_by=mango")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("Status: 200, articles are sorted by created_at by default", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", { ascending: true });
+      });
+  });
+  describe("Article queries, sort by and order by", () => {
+    test("Status: 200, responds with articles sorted by title and in an ascending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("title", { ascending: true });
+        });
+    });
+    test("Status: 200, responds with articles sorted by votes and in an ascending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("votes", { ascending: true });
+        });
+    });
+    test("Status: 200, responds with articles sorted by author and in an ascending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("author", { ascending: true });
+        });
+    });
+    test("Status: 400, responds a bad request message when passed an invalid order by", () => {
+      return request(app)
+        .get("/api/articles?order=mango")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test('Status: 400, responds with "invalid order query" if given a non-valid order data-type', () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes&order=not-valid")
+        .expect(400)
+        .then((error) => {
+          expect(error.body).toEqual({ msg: "Bad Request" });
+        });
+    });
+  });
+  describe("Topic queries", () => {
+    test("Status: 200, responds with all articles filtered by topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body }) => {
+          body.articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+          });
+        });
+    });
+    xtest("Status: 200, responds with all topic linked to an author specified in the query", () => {
+      return request(app)
+        .get("/api/articles?author=icellusedkars")
+        .expect(200)
+        .then(({ body }) => {
+          body.articles.forEach((article) => {
+            expect(article.author).toEqual("icellusedkars");
+          });
+        });
+    });
   });
 });
 
 /***users***/
-xdescribe("6. GET/api/users", () => {
+describe("6. GET/api/users", () => {
   test("status:200, responds with an array of objects with the property username", () => {
     return request(app)
       .get("/api/users")
