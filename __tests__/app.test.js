@@ -7,7 +7,7 @@ const testData = require("../db/data/test-data");
 beforeEach(() => seed(testData));
 
 afterAll(() => {
-  if (db.end) db.end();
+  db.end();
 });
 
 /***topics***/
@@ -349,12 +349,21 @@ xdescribe("6. GET/api/users", () => {
 });
 
 /***comments***/
-describe.only("12. DELETE /api/comments/:comment_id", () => {
+describe("12. DELETE /api/comments/:comment_id", () => {
   test("Status: 204, responds with no content after deleting a given comment (:comment_id)", () => {
     const comment_id = 3;
     return request(app).delete(`/api/comments/${comment_id}`).expect(204);
   });
-  xtest("Status: 404, should return bad request message when comment_id is invalid data type", () => {
+  test("status: 400, should return bad request message when comment_id is invalid data type", () => {
+    const comment_id = "invalid_comment_id";
+    return request(app)
+      .delete(`/api/comments/${comment_id}`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("Status: 404, should return path not found error when comment_id doesn't exist", () => {
     const comment_id = "404";
     return request(app)
       .delete(`/api/comments/${comment_id}`)
