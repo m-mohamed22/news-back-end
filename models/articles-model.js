@@ -73,20 +73,35 @@ exports.updateArticleById = (articleId, incVotes) => {
     });
 };
 
-exports.selectAllArticles = () => {
-  return db
-    .query(
-      `SELECT articles.*, 
+exports.selectAllArticles = ({
+  sort_by = "created_at",
+  order = "desc",
+  topic,
+}) => {
+  const validSortBy = ["title", "author", "votes", "created_at"];
+  const validOrder = ["asc", "desc"];
+  const validTopic = [];
+
+  let queryStr = `SELECT articles.*, 
   CAST(COUNT(comments.article_id) AS INT) AS comment_count 
   FROM articles 
-  LEFT JOIN comments ON articles.article_id = comments.article_id 
-  GROUP BY articles.article_id
-  ORDER BY articles.created_at DESC;`
-    )
-    .then((articles) => {
-      if (!articles.rows.length) {
-        return Promise.reject({ status: 404, msg: "Invalid ID not found" });
-      }
-      return articles.rows;
-    });
+  LEFT JOIN comments ON articles.article_id = comments.article_id `;
+
+  if (topic) {
+    queryStr += ` WHERE articles.topic = $1`;
+    validTopic.push(topic);
+  }
+
+  if (validSortBy.includes(sort_by) && validOrder.includes(order)) {
+    queryStr += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
+  } else {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+
+  return db.query(queryStr, validTopic).then((articles) => {
+    if (!articles.rows.length) {
+      return Promise.reject({ status: 404, msg: "Invalid ID not found" });
+    }
+    return articles.rows;
+  });
 };

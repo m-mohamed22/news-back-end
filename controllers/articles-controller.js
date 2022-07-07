@@ -7,7 +7,8 @@ const {
 } = require("../models/articles-model.js");
 
 exports.getAllArticles = (req, res, next) => {
-  selectAllArticles()
+  // const { sort_by } = req.query;
+  selectAllArticles(req.query)
     .then((articles) => {
       res.status(200).send({ articles });
     })
@@ -45,7 +46,7 @@ exports.postNewCommentById = (req, res, next) => {
       res.status(201).send({ newCommentPost: newCommentPost });
     })
     .catch((err) => {
-      console.log(err, "controller");
+      console.log(err, "<< controller");
       next(err);
     });
 };
