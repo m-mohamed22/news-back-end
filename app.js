@@ -10,6 +10,7 @@ const {
   getAllArticles,
   getAllCommentsById,
   postNewCommentById,
+  deleteCommentById,
 } = require("./controllers/articles-controller");
 
 const { getUsers } = require("./controllers/users-controller ");
@@ -33,6 +34,8 @@ app.post("/api/articles/:article_id/comments", postNewCommentById);
 
 app.patch("/api/articles/:article_id", patchArticleById);
 
+app.delete("/api/comments/:comments_id", deleteCommentById);
+
 /***users***/
 app.get("/api/users", getUsers);
 
@@ -51,6 +54,9 @@ app.use((err, req, res, next) => {
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     return res.status(400).send({ msg: "Bad Request" });
+  }
+  if (err.code === "23503") {
+    return res.status(404).send({ msg: "Error, path not found" });
   } else next(err);
 });
 

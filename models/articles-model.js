@@ -90,3 +90,11 @@ exports.selectAllArticles = () => {
       return articles.rows;
     });
 };
+
+exports.removeCommentById = (comment_id) => {
+  let deleteQuery = ` DELETE FROM comments WHERE comment_id = $1`;
+
+  return db.query(deleteQuery, [comment_id]).then((result) => {
+    return result.rows;
+  });
+};
