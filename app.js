@@ -14,11 +14,14 @@ const {
 } = require("./controllers/articles-controller");
 
 const { getUsers } = require("./controllers/users-controller ");
+const { getApi } = require("./controllers/api-controllers");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.get("/api/", getApi);
 
 /***topics***/
 app.get("/api/topics", getTopics);
